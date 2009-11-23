@@ -11,6 +11,7 @@ function writeLog(text) {
   var date = new Date;
   var today = [
      date.getFullYear(),
+     // Poor man's zero padding FTW
      ('0'+(date.getMonth()+1)).substr(-2),
      ('0'+date.getDate()).substr(-2),
   ].join('-');
