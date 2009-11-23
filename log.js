@@ -46,6 +46,10 @@ client.addListener('PART', function(prefix) {
 
 client.addListener('PRIVMSG', function(prefix, channel, text) {
   switch (text) {
+    case '!source':
+    case '!src':
+      this.send('PRIVMSG', channel, ':Source is here: '+config.srcUrl);
+      break;
     case '!logs':
     case '!log':
       this.send('PRIVMSG', channel, ':Logs are here: '+config.logUrl);
