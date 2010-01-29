@@ -31,7 +31,10 @@ function writeLog(text) {
   logFile.write('['+time+'] '+text+"<br />\n");
 }
 
-var client = new irc.Client(config.host, config.port);
+var
+  client = new irc.Client(config.host, config.port),
+  inChannel = false;
+
 client.connect(config.user);
 
 client.addListener('001', function() {
@@ -39,6 +42,8 @@ client.addListener('001', function() {
 });
 
 client.addListener('JOIN', function(prefix) {
+  inChannel = true;
+
   var user = irc.user(prefix);
   writeLog(user+' has joined the channel');
 });
@@ -46,6 +51,23 @@ client.addListener('JOIN', function(prefix) {
 client.addListener('PART', function(prefix) {
   var user = irc.user(prefix);
   writeLog(user+' has left the channel');
+});
+
+client.addListener('DISCONNECT', function() {
+  puts('Disconnected, re-connect in 5s');
+  setTimeout(function() {
+    puts('Trying to connect again ...');
+
+    inChannel = false;
+    client.connect(config.user);
+    setTimeout(function() {
+      if (!inChannel) {
+        puts('Re-connect timeout');
+        client.disconnect();
+        client.emit('DISCONNECT', 'timeout');
+      }
+    }, 5000);
+  }, 5000);
 });
 
 client.addListener('PRIVMSG', function(prefix, channel, text) {
