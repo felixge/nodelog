@@ -6,8 +6,6 @@ var file = require('file');
 var path = require('path');
 var repl = require('repl');
 
-var urlRegExp = /\b(([\w-]+:\/\/?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^!'#%&()*+,-.\/:;<=>?@\[\]^_{|}~\s]|\/)))/;
-
 var logFile, day;
 function writeLog(text) {
   var date = new Date;
@@ -19,8 +17,7 @@ function writeLog(text) {
   ].join('-');
 
   if (!logFile || day !== today) {
-    logFile = new file.File(path.join(config.logPath, today+'.html'), 'a+', {encoding: 'utf8'});
-    logFile.write('<style>body { font-family: monospace; }</style>\n');
+    logFile = new file.File(path.join(config.logPath, today+'.txt'), 'a+', {encoding: 'utf8'});
     day = today;
   }
   
@@ -28,7 +25,7 @@ function writeLog(text) {
     ('0'+date.getHours()).substr(-2),
     ('0'+date.getMinutes()).substr(-2)
   ].join(':');
-  logFile.write('['+time+'] '+text+"<br />\n");
+  logFile.write('['+time+'] '+text+"\n");
 }
 
 var
@@ -83,7 +80,7 @@ client.addListener('PRIVMSG', function(prefix, channel, text) {
   }
 
   var user = irc.user(prefix);
-  writeLog(user+': '+text.replace(urlRegExp, '<a href="$1">$1</a>'));
+  writeLog(user+': '+text);
 });
 
 repl.start("logbot> ");
