@@ -38,7 +38,6 @@ var
 client.connect(config.user);
 
 client.addListener('001', function() {
-  sys.puts('001!');
   this.send('JOIN', config.channel);
 });
 
