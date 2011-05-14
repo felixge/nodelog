@@ -1,10 +1,12 @@
-process.mixin(require('sys'));
-var config = require('./config');
+var sys = require('sys');
+var config = require('./config').config;
 
 var irc = require('./lib/irc');
-var file = require('file');
+var fs = require('fs');
 var path = require('path');
 var repl = require('repl');
+
+sys.puts(sys.inspect(config));
 
 var logFile, day;
 function writeLog(text) {
@@ -17,7 +19,8 @@ function writeLog(text) {
   ].join('-');
 
   if (!logFile || day !== today) {
-    logFile = new file.File(path.join(config.logPath, today+'.txt'), 'a+', {encoding: 'utf8'});
+    var logFilePath = path.join(config.logPath, today+'.txt');
+    logFile = fs.createWriteStream(logFilePath, {'flags': 'a+', 'encoding': 'utf8'});
     day = today;
   }
   
@@ -25,7 +28,7 @@ function writeLog(text) {
     ('0'+date.getHours()).substr(-2),
     ('0'+date.getMinutes()).substr(-2)
   ].join(':');
-  logFile.write('['+time+'] '+text+"\n");
+  logFile.write('['+time+'] '+text+'\n');
 }
 
 var
@@ -35,6 +38,7 @@ var
 client.connect(config.user);
 
 client.addListener('001', function() {
+  sys.puts('001!');
   this.send('JOIN', config.channel);
 });
 
